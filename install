@@ -1,0 +1,9 @@
+#!/bin/sh
+DOTFILES=$PWD
+pushd $DOTFILES
+for folder in */
+do folder=$(echo $folder | sed "s/\// /g")
+    stow -D --target=$HOME $folder
+    stow --target=$HOME $folder
+done
+popd
