@@ -7,15 +7,15 @@ set expandtab
 set shiftwidth=4
 set smartindent
 
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.config/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'ayu-theme/ayu-vim'
+Plug 'dracula/vim', { 'as': 'dracula' }
 call plug#end()
 
+syntax enable
 set termguicolors     " enable true colors support
-let ayucolor="dark"   " for dark version of theme
-colorscheme ayu
+colorscheme dracula
 
 let mapleader = " "
 nnoremap <leader>pv :Vex<CR>
