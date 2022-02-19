@@ -8,13 +8,24 @@ set shiftwidth=4
 set smartindent
 
 call plug#begin('~/.config/nvim/plugged')
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+
+"FZF
+"  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+"  Plug 'junegunn/fzf.vim'
+
+"Dracula
 Plug 'dracula/vim', { 'as': 'dracula' }
+
+"Telescope
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+
 call plug#end()
 
+if (has("termguicolors"))
+    set termguicolors     " enable true colors support
+endif
 syntax enable
-set termguicolors     " enable true colors support
 colorscheme dracula
 
 let mapleader = " "
