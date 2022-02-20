@@ -19,6 +19,7 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 "Telescope
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.fzf.nvim', { 'do': 'make' }
 
 call plug#end()
 
@@ -30,9 +31,9 @@ colorscheme dracula
 
 let mapleader = " "
 nnoremap <leader>pv :Vex<CR>
-nnoremap <leader><CR> :so ~/.vimrc<CR>
-nnoremap <C-p> :GFiles<CR>
-nnoremap <leader>pf :Files<CR>
+nnoremap <leader><CR> :so ~/.config/nvim/init.vim<CR>
+" nnoremap <C-p> :GFiles<CR>
+" nnoremap <leader>pf :Files<CR>
 nnoremap <C-k> :cnext<CR>
 nnoremap <C-j> :cprev<CR>
 
@@ -48,3 +49,18 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
 set re=0
+"
+"Telescope fzf
+lua << EOF
+let actions = require('telescope.actions')
+require('telescope').setup{
+    defaults = {
+        mappings = {
+            n = {
+                ['<C-j'] = action.move_selection_previous
+            }
+        }
+    }
+}
+require('telescope').load_extension('fzf')
+EOF
