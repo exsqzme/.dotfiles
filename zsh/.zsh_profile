@@ -1,52 +1,42 @@
-export DEV=$HOME/dev/github.com/exsqzme
-export DOTFILES=$DEV/.dotfiles
+# Detect the platform (similar to $OSTYPE)
+OS="`uname`"
+case $OS in
+  "Linux")
+    export OS="Linux"
+    alias ls="ls --color=auto"
+    ;;
+  "FreeBSD")
+    export OS="FreeBSD"
+    alias ls="ls -G"
+    ;;
+  "WindowsNT")
+    export OS="Windows"
+    ;;
+  "Darwin") 
+    export OS="Mac"
+    alias ls="ls -G"
+    ;;
+  "SunOS")
+    export OS="Solaris"
+    ;;
+  "AIX")
+    export OS="Unknown"
+    ;;
+  *)
+    export OS="Unknown"
+    ;;
+esac
+
+EXSQZME=$HOME/dev/github.com/exsqzme
+CONFIGS=$EXSQZME/.dotfiles/myconfig
+DOTFILES=$EXSQZME/.dotfiles
 VIM="nvim"
 
-catr() {
-    tail -n "+$1" $3 | head -n "$(($2 - $1 + 1))"
-}
+if [ -d $CONFIGS ]; then
+  for file in $CONFIGS/*; do
+      source $file
+#    . "$file"
+  done
+fi
 
-validateYaml() {
-    python -c 'import yaml,sys;yaml.safe_load(sys.stdin)' < $1
-}
-
-goWork() {
-    cp ~/.npm_work_rc ~/.npmrc
-}
-
-goPersonal() {
-    cp ~/.npm_personal_rc ~/.npmrc
-}
-
-addThrottle() {
-    local kbs="kbps"
-    echo $kbs
-    echo "About to throttle to $1 $kbs"
-    echo "sudo tc qdisc add dev wlp59s0 handle 1: root htb default 11"
-    echo "sudo tc class add dev wlp59s0 parent 1: classid 1:1 htb rate $1$kbs"
-    echo "sudo tc class add dev wlp59s0 parent 1:1 classid 1:11 htb rate $1$kbs"
-    sudo tc qdisc add dev wlp59s0 handle 1: root htb default 11
-    sudo tc class add dev wlp59s0 parent 1: classid 1:1 htb rate $1$kbs
-    sudo tc class add dev wlp59s0 parent 1:1 classid 1:11 htb rate $1$kbs
-}
-
-removeThrottle() {
-    sudo tc qdisc del dev wlp59s0 root
-}
-
-cat1Line() {
-    cat $1 | tr -d "\n"
-}
-
-ioloop() {
-    FIFO=$(mktemp -u /tmp/ioloop_$$_XXXXXX ) &&
-    trap "rm -f $FIFO" EXIT &&
-    mkfifo $FIFO &&
-    ( : <$FIFO & ) &&    # avoid deadlock on opening pipe
-    exec >$FIFO <$FIFO
-}
-
-eslintify() {
-    cat $1 > /tmp/file_to_eslint
-    npx eslint
-}
+addToPath $HOME/.local/bin

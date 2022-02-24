@@ -1,0 +1,4 @@
+#!/bin/sh
+
+url=$(urlencode "$*")
+lynx "https://en.wikipedia.org/wiki/Special:Search/$url"
