@@ -9,8 +9,8 @@ set smartindent
 
 " Install vim-plug if not already installed
 " can adjust to use vim vs nvim
-"if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+"let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+let data_dir = ~/.local/share/nvim/site 
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source ~/.config/nvim/init.vim
@@ -33,6 +33,7 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#end()
     " set background=dark
     colorscheme dracula
+    require('exsqzme')
 endif
 
 if (has("termguicolors"))
@@ -60,17 +61,3 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
 set re=0
-"Telescope fzf
-lua << EOF
-local actions = require('telescope.actions')
-require('telescope').setup{
-    defaults = {
-        --mappings = {
-          --  n = {
-           --     ['<C-j'] = action.move_selection_previous
-           -- }
-       -- }
-    }
-}
-require('telescope').load_extension('fzf')
-EOF
