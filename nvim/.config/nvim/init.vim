@@ -24,7 +24,7 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#end()
     " set background=dark
     colorscheme dracula
-    lua require('exsqzme')
+    lua require('exsqzme.telescope')
 endif
 
 if (has("termguicolors"))
