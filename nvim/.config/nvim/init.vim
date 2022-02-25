@@ -8,35 +8,37 @@ set shiftwidth=4
 set smartindent
 
 " Install vim-plug if not already installed
-if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall
+" can adjust to use vim vs nvim
+"if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source ~/.config/nvim/init.vim
 endif
 
 " only load plugins if Plug detected
 if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#begin('~/.config/nvim/plugged')
-        "FZF
-        "  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-        "  Plug 'junegunn/fzf.vim'
+    "FZF
+    "  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    "  Plug 'junegunn/fzf.vim'
 
-        "Dracula
-        Plug 'dracula/vim', { 'as': 'dracula' }
+    "Dracula
+    Plug 'dracula/vim', { 'as': 'dracula' }
 
-        "Telescope
-        Plug 'nvim-lua/plenary.nvim'
-        Plug 'nvim-telescope/telescope.nvim'
-        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+    "Telescope
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+    Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
     call plug#end()
+    " set background=dark
+    colorscheme dracula
 endif
 
 if (has("termguicolors"))
     set termguicolors     " enable true colors support
 endif
 syntax enable
-" set background=dark
-colorscheme dracula
 
 let mapleader = " "
 nnoremap <leader>pv :Vex<CR>
