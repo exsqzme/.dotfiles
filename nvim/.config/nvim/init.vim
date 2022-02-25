@@ -7,26 +7,35 @@ set expandtab
 set shiftwidth=4
 set smartindent
 
-call plug#begin('~/.config/nvim/plugged')
+" Install vim-plug if not already installed
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
+endif
 
-"FZF
-"  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-"  Plug 'junegunn/fzf.vim'
+" only load plugins if Plug detected
+if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
+    call plug#begin('~/.config/nvim/plugged')
+        "FZF
+        "  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+        "  Plug 'junegunn/fzf.vim'
 
-"Dracula
-Plug 'dracula/vim', { 'as': 'dracula' }
+        "Dracula
+        Plug 'dracula/vim', { 'as': 'dracula' }
 
-"Telescope
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
-
-call plug#end()
+        "Telescope
+        Plug 'nvim-lua/plenary.nvim'
+        Plug 'nvim-telescope/telescope.nvim'
+        Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+    call plug#end()
+endif
 
 if (has("termguicolors"))
     set termguicolors     " enable true colors support
 endif
 syntax enable
+" set background=dark
 colorscheme dracula
 
 let mapleader = " "
@@ -49,7 +58,6 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
 set re=0
-"
 "Telescope fzf
 lua << EOF
 local actions = require('telescope.actions')
