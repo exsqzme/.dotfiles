@@ -10,7 +10,7 @@ set smartindent
 " Install vim-plug if not already installed
 " can adjust to use vim vs nvim
 "let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-let data_dir = ~/.local/share/nvim/site 
+let data_dir = '~/.local/share/nvim/site'
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source ~/.config/nvim/init.vim
@@ -33,7 +33,7 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#end()
     " set background=dark
     colorscheme dracula
-    require('exsqzme')
+    lua require('exsqzme')
 endif
 
 if (has("termguicolors"))
