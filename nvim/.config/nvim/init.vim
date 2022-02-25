@@ -7,15 +7,6 @@ set expandtab
 set shiftwidth=4
 set smartindent
 
-" Install vim-plug if not already installed
-" can adjust to use vim vs nvim
-"let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-let data_dir = '~/.local/share/nvim/site'
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source ~/.config/nvim/init.vim
-endif
-
 " only load plugins if Plug detected
 if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#begin('~/.config/nvim/plugged')
