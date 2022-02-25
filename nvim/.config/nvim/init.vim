@@ -19,7 +19,7 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 "Telescope
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-telescope/telescope-fzf-native.fzf.nvim', { 'do': 'make' }
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 call plug#end()
 
@@ -52,14 +52,14 @@ set re=0
 "
 "Telescope fzf
 lua << EOF
-let actions = require('telescope.actions')
+local actions = require('telescope.actions')
 require('telescope').setup{
     defaults = {
-        mappings = {
-            n = {
-                ['<C-j'] = action.move_selection_previous
-            }
-        }
+        --mappings = {
+          --  n = {
+           --     ['<C-j'] = action.move_selection_previous
+           -- }
+       -- }
     }
 }
 require('telescope').load_extension('fzf')
