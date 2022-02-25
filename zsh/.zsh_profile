@@ -39,4 +39,4 @@ if [ -d $CONFIGS ]; then
   done
 fi
 
-addToPath $HOME/.local/bin
+addToPathFront $HOME/.local/bin
