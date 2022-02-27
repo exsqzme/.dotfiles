@@ -24,14 +24,42 @@ set hidden " I like having buffers stay around
 
 
 
-"####### screen
+"####### screen ######
 " enough for line numbers + gutter within 80 standard
+" Vim won't do anything unless requested. textwidth will have an effect for currently edited lines if you either have t (for non-comments only), c (for comments only) or both in formatoptions (if a is not present there, then it will autowrap only when you reach the margin set by textwidth), or if you use gq to reformat your text. If I am not mistaking, you can set such formatexpr or formatprg so that textwidth will be ignored.
+" Try gggqGto apply the new text width to the whole buffer.
 set textwidth=72
 set colorcolumn=80
 set wrap
 set breakindent
 set linebreak
 let &showbreak=repeat(' ', 3)
+
+"###### FORMATTING OPTIONS ############
+set fo-=t   " don't auto-wrap text using text width
+set fo+=c   " autowrap comments using textwidth with leader
+set fo+=r   " auto-insert comment leader on enter in insert
+set fo-=o   " don't auto-insert comment leader on o/O in normal
+set fo+=q   " allow formatting of comments with gq
+set fo-=w   " don't use trailing whitespace for paragraphs
+set fo-=a   " disable auto-formatting of paragraph changes
+set fo-=n   " don't recognized numbered lists
+set fo+=j   " delete comment prefix when joining
+set fo-=2   " don't use the indent of second paragraph line
+set fo-=v   " don't use broken 'vi-compatible auto-wrapping'
+set fo-=b   " don't use broken 'vi-compatible auto-wrapping'
+set fo+=l   " long lines not broken in insert mode
+set fo+=m   " multi-byte character line break support
+set fo+=M   " don't add space before or after multi-byte char
+set fo-=B   " don't add space between two multi-byte chars
+set fo+=1   " don't break a line after a one-letter word
+
+
+
+
+
+
+"####### screen PART 2 ######
 set scrolloff=8
 set icon
 "set showmatch
@@ -46,6 +74,9 @@ set showmode
 set ruler " show cursor position
 set nostartofline " dont reest cursor to start of line when moving around
 set laststatus=2 " always show status line
+
+
+
 
 
 
@@ -122,24 +153,6 @@ set gdefault " Add the g flag to search/replace by default
 
 
 
-"###### FORMATTING OPTIONS ############
-set fo-=t   " don't auto-wrap text using text width
-set fo+=c   " autowrap comments using textwidth with leader
-set fo+=r   " auto-insert comment leader on enter in insert
-set fo-=o   " don't auto-insert comment leader on o/O in normal
-set fo+=q   " allow formatting of comments with gq
-set fo-=w   " don't use trailing whitespace for paragraphs
-set fo-=a   " disable auto-formatting of paragraph changes
-set fo-=n   " don't recognized numbered lists
-set fo+=j   " delete comment prefix when joining
-set fo-=2   " don't use the indent of second paragraph line
-set fo-=v   " don't use broken 'vi-compatible auto-wrapping'
-set fo-=b   " don't use broken 'vi-compatible auto-wrapping'
-set fo+=l   " long lines not broken in insert mode
-set fo+=m   " multi-byte character line break support
-set fo+=M   " don't add space before or after multi-byte char
-set fo-=B   " don't add space between two multi-byte chars
-set fo+=1   " don't break a line after a one-letter word
 
 
 
@@ -170,6 +183,7 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
     Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+    Plug 'nvim-telescope/telescope-file-browser.nvim'
     call plug#end()
     syntax enable
     " set background=dark
