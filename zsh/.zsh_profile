@@ -27,10 +27,18 @@ case $OS in
     ;;
 esac
 
+# ---------------------- local utility functions ---------------------
+
+_have()      { type "$1" &>/dev/null; }
+_source_if() { [[ -r "$1" ]] && source "$1"; }
+
+# --
+
 EXSQZME=$HOME/dev/github.com/exsqzme
 CONFIGS=$EXSQZME/.dotfiles/myconfig
 DOTFILES=$EXSQZME/.dotfiles
-VIM="nvim"
+VIM="vim"
+_have nvim && VIM="nvim"
 
 if [ -d $CONFIGS ]; then
   for file in $CONFIGS/*; do

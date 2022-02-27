@@ -1,3 +1,5 @@
+unalias -a
+
 alias vim="$VIM"
 alias python="python3"
 alias pjson="python -mjson.tool"
