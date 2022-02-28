@@ -2,8 +2,10 @@
 DOTFILES=$PWD
 pushd $DOTFILES
 for folder in */
-do folder=$(echo $folder | sed "s/\// /g")
-    stow -D --target=$HOME $folder
-    stow --target=$HOME $folder
+do folder=$(echo $folder | sed "s/\///g")
+    if [ "$folder" != "nostow" ]; then
+        stow -D --target=$HOME $folder
+        stow --target=$HOME $folder
+    fi
 done
 popd
