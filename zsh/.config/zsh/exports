@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export TERM=xterm-256color
+export EDITOR='nvim'
+
+# Use nvim as manpager `:h Man`
+export MANPAGER='nvim +Man!'
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# HIST_STAMPS="mm/dd/yyyy"
+export HISTSIZE=100000000
+export SAVEHIST=$HISTSIZE
+export HISTFILE=$HOME/.zsh_history
+# export HISTCONTROL='ignoreboth' # bash ignore space and dups
+
+

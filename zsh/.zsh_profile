@@ -3,18 +3,22 @@ OS="`uname`"
 case $OS in
   "Linux")
     export OS="Linux"
-    alias ls="ls --color=auto"
     ;;
   "FreeBSD")
     export OS="FreeBSD"
-    alias ls="ls -G"
     ;;
   "WindowsNT")
     export OS="Windows"
     ;;
   "Darwin") 
     export OS="Mac"
-    alias ls="ls -G"
+    # Install GNU `sed`, overwriting the built-in `sed`.
+    # brew install gnu-sed --with-default-names`
+    PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+    PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+    PATH="/usr/local/opt/fgrep/libexec/gnubin:$PATH"
+    PATH="/usr/local/opt/egrep/libexec/gnubin:$PATH"
+    PATH="/usr/local/opt/less/libexec/gnubin:$PATH"
     ;;
   "SunOS")
     export OS="Solaris"
@@ -27,15 +31,12 @@ case $OS in
     ;;
 esac
 
-# ---------------------- local utility functions ---------------------
-
-_have()      { type "$1" &>/dev/null; }
-_source_if() { [[ -r "$1" ]] && source "$1"; }
-
 # --
 
+ENABLE_CORRECTION="true"
+
 EXSQZME=$HOME/dev/github.com/exsqzme
-CONFIGS=$EXSQZME/.dotfiles/myconfig
+CONFIGS=$EXSQZME/.dotfiles/zsh/.config/zsh
 DOTFILES=$EXSQZME/.dotfiles
 VIM="vim"
 _have nvim && VIM="nvim"
@@ -47,4 +48,15 @@ if [ -d $CONFIGS ]; then
   done
 fi
 
-addToPathFront $HOME/.local/bin
+# sources=(
+#     'alias'
+#     'exports'
+#     'funcs'
+#     'pyenv'
+# )
+# for s in "${sources[@]}"; do
+#   source $HOME/.config/zsh/${s}
+# done
+
+_addToPathFront $HOME/.local/bin
+_addToPath $GOPATH/bin

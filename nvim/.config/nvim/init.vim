@@ -1,15 +1,16 @@
+scriptencoding utf-8
+
 set nocompatible
 set number
 set relativenumber
+set numberwidth=4
+" show diagnostic signs in numbers column - for gitsigns
+"set signcolumn=number
 
 "####### Indents #######
 set autoindent
 "set smartindent
 "set cindent
-"
-" Load filetype-specific indent files
-" Also enables plugins?
-filetype plugin indent on
 
 "##### tabs #####
 set tabstop=4
@@ -66,6 +67,7 @@ set icon
 set showcmd
 set cmdheight=1 " Give more space for displaying messages.
 " set noequalalways
+" open splits intuitively
 " set splitright
 " set splitbelow
 set ttyfast " faster scrolling
@@ -169,6 +171,8 @@ endif
 
 
 
+let mapleader=","
+
 " only load plugins if Plug detected
 if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     call plug#begin('~/.config/nvim/plugged')
@@ -184,20 +188,68 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     Plug 'nvim-telescope/telescope.nvim'
     Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
     Plug 'nvim-telescope/telescope-file-browser.nvim'
+
+    " LSP
+    " steps: install lsp, install language server, configure lsp
+    Plug 'neovim/nvim-lspconfig'
+
+    " lsp autocomplete
+    Plug 'hrsh7th/nvim-cmp'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/cmp-path'
+    Plug 'onsails/lspkind-nvim'
+    
+    " lsp autocomplete snippets
+    Plug 'L3MON4D3/LuaSnip'
+    Plug 'saadparwaiz1/cmp_luasnip'
+    Plug 'rafamadriz/friendly-snippets'
+
+    " treesitter
+    Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+
+    "comment
+    Plug 'numToStr/Comment.nvim'
+
+    " Git
+    Plug 'tpope/vim-fugitive'
+    Plug 'junegunn/gv.vim'
+    " Plug 'tpope/vim-rhubarb'
+    Plug 'lewis6991/gitsigns.nvim'
+
+    " rust-analyzer
+    " Plug 'simrat39/rust-tools.nvim'
+
+    " Debugging
+    Plug 'mfussenegger/nvim-dap'
+    Plug 'leoluz/nvim-dap-go'
+    Plug 'rcarriga/nvim-dap-ui'
+    Plug 'theHamsta/nvim-dap-virtual-text'
+    Plug 'nvim-telescope/telescope-dap.nvim'
+
+    " Plug 'tpope/vim-dispatch'
+    " Plug 'sbdchd/neoformat'
+
+    Plug 'tpope/vim-obsession'
+
+    Plug 'nvim-lualine/lualine.nvim'
+    Plug 'kyazdani42/nvim-web-devicons'
     call plug#end()
     syntax enable
     " set background=dark
     colorscheme dracula
-    lua require('exsqzme.telescope')
+    lua require('exsqzme')
 endif
+
+
+" Load filetype-specific indent files
+" Also enables plugins?
+filetype plugin indent on
+
 
 if (has("termguicolors"))
     set termguicolors     " enable true colors support
 endif
-
-
-
-
 
 
 
@@ -212,12 +264,13 @@ let loaded_matchparen = 1
 
 
 
-let mapleader=","
+" set above plug so lua files can have access (good ?)
+" let mapleader=","
 
 " Prevent entering EX mode ? vi compat?
 nnoremap <silent> Q <nop>
-" TODO
 nnoremap <silent> <C-f> :silent !tmux neww tmux-sessionizer<CR>
+" TODO
 "inoremap <Up>     <C-o>:echom "--> k <-- "<CR>
 "inoremap <Down>   <C-o>:echom "--> j <-- "<CR>
 "inoremap <Right>  <C-o>:echom "--> l <-- "<CR>
@@ -231,6 +284,7 @@ nnoremap <Right> gt
 nnoremap <Left>  gT
 
 " Easier Moving between splits
+" nnoremap <leader>h :wincmd h<Cr>
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
@@ -325,21 +379,34 @@ nnoremap <leader>cd :windo lcd
 
 nnoremap <leader>x :silent !chmod +x %<CR>
 nnoremap <leader>pv :Vex<CR>
+
+
+
+nnoremap <c-p> :Telescope find_files <cr>
+" telescope bufers
+" telescope live_grep
+
+
 nnoremap <leader><CR> :so ~/.config/nvim/init.vim<CR>
 
 
-
-
-
-
+" Ctrl+/
+" nnoremap <C-_> :Telescope current_buffer_fuzzy_find sorting_strategy=ascending prompt_position=top <cr>
+"nnoremap <C-_> <cmd>lua require('telescope.builtin').current_buffer_fuzzy_find({ sorting_strategy="ascending", layout_config={ prompt_position="top" } })<cr>
+nnoremap <C-_> <cmd>lua require('exsqzme.telescope.utils').curbuf() <cr>
+nnoremap <F4> :lua package.loaded.exsqzme = nil <cr>
 "nnoremap <C-k> :cnext<CR>
 "nnoremap <C-j> :cprev<CR>
 
-
+nnoremap <leader>en <cmd>lua require('exsqzme.telescope.utils').edit_neovim() <cr>
+nnoremap <leader>ez <cmd>lua require('exsqzme.telescope.utils').edit_zsh() <cr>
 
 
 
 " where M = alt
+" enable alt on mac via terminal settings
+" kitty maos_option_as_alt left
+"
 "inoremap <M-j> <Esc>:m .+1<CR>==gi
 "inoremap <M-k> <Esc>:m .-2<CR>==gi
 "vnoremap <M-j> :m '>+1<CR>gv=gv

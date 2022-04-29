@@ -1,0 +1,191 @@
+#!/usr/bin/env zsh
+
+unalias -a
+
+alias vim="$VIM"
+# alias python="python3"
+alias pjson="python -mjson.tool"
+alias xsc="xclip -selection clipboard"
+
+# Normalize `open` across Linux, macOS, and Windows.
+# This is needed to make the `o` function (see funcs) cross-platform.
+if [ ! $(uname -s) = 'Darwin' ]; then
+	if grep -q Microsoft /proc/version; then
+		# Ubuntu on Windows using the Linux subsystem
+		alias open='explorer.exe';
+	else
+		alias open='xdg-open';
+	fi
+fi
+
+# `o` with no arguments opens the current directory, otherwise opens the given
+# location
+function o() {
+	if [ $# -eq 0 ]; then
+		open .;
+	else
+		open "$@";
+	fi;
+}
+alias cl=clear
+
+if _have exa; then
+    LS_PREFIX="exa --color=always"
+    alias ls="$LS_PREFIX --icons -F --group-directories-first"
+    alias ll="$LS_PREFIX --icons -abghHliS"
+    #
+    # List only directories
+    alias lsd="$LS_PREFIX -lD --tree"
+else
+    distros=(FreeBSD Mac)
+    LS_PREFIX="ls --color"
+    if (($distros[(Ie)$OS])); then
+        _have gls && LS_PREFIX="gls --color"
+        _have gls || LS_PREFIX="ls -G"
+    fi
+
+    alias ls="$LS_PREFIX -F --group-directories-first"
+    alias ll="$LS_PREFIX -lshA"
+
+    # List only directories
+    alias lsd="$LS_PREFIX -lAF | grep --color=never '^d'"
+fi
+unset LS_PREFIX
+unset distros
+
+# Always enable colored `grep` output
+# Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
+alias grep='rg --color=auto'
+# alias grep='grep --color=auto'
+# alias fgrep='fgrep --color=auto'
+# alias egrep='egrep --color=auto'
+
+# Intuitive map function
+# For example, to list all directories that contain a certain file:
+# find . -name .gitattributes | map dirname
+alias map="xargs -n1"
+
+
+
+
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en0"
+alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+# alias ipinfo="curl ipinfo.io"
+
+# Show active network interfaces
+alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'"
+
+# Flush Directory Service cache
+alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+
+
+
+# Get week number
+alias week='date +%V'
+
+alias weather="curl -L wttr.in"
+
+
+
+# JavaScriptCore REPL
+# https://furbo.org/2021/08/25/jsc-my-new-best-friend/
+jscbin="/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc"
+[ -e "${jscbin}" ] && alias jsc="${jscbin}";
+unset jscbin;
+
+# Airport CLI alias
+# https://osxdaily.com/2007/01/18/airport-the-little-known-command-line-wireless-utility/
+alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport'
+
+
+
+
+# One of @janmoesen’s ProTip™s
+for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+	alias "${method}"="lwp-request -m '${method}'"
+done
+
+
+
+
+
+
+
+
+# Canonical hex dump; some systems have this symlinked
+command -v hd > /dev/null || alias hd="hexdump -C"
+
+# macOS has no `md5sum`, so use `md5` as a fallback
+command -v md5sum > /dev/null || alias md5sum="md5"
+
+# macOS has no `sha1sum`, so use `shasum` as a fallback
+command -v sha1sum > /dev/null || alias sha1sum="shasum"
+
+# TODO: make func??
+# URL-encode strings
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
+
+
+
+# Google Chrome
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+alias canary='/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary'
+
+
+# Enable aliases to be sudo’ed
+alias sudo='sudo '
+
+# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+# alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup'
+
+# Recursively delete `.DS_Store` files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+
+# Empty the Trash on all mounted volumes and the main HDD.
+# Also, clear Apple’s System Logs to improve shell startup speed.
+# Finally, clear download history from quarantine. https://mths.be/bum
+alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
+
+
+
+
+alias sqz="cd $EXSQZME"
+alias dotFileInstall="$DOTFILES/install"
+alias bp="dotFileInstall && source ~/.zshrc"
+
+alias ebp="$VIM $DOTFILES/zsh/.zsh_profile"
+alias etc="$VIM $DOTFILES/tmux/.tmux.conf"
+alias evrc="$VIM $DOTFILES/vim/.vimrc"
+alias enrc="nvim $DOTFILES/nvim/.config/nvim/init.vim --cmd \"cd $DOTFILES/nvim/.config/nvim/init.vim\""
+alias eirc="nvim $DOTFILES/i3/.config/i3/i3config"
+
+
+alias killBT="rfkill block bluetooth"
+alias unKillBT="rfkill unblock bluetooth"
+
+alias "?"=duck
+alias "??"=google
+
+
+
+
+
+
+
+
+# Stuff I never really use but cannot delete either because of http://xkcd.com/530/
+alias stfu="osascript -e 'set volume output muted true'"
+alias pumpitup="osascript -e 'set volume output volume 100'"
+
+# Kill all the tabs in Chrome to free up memory
+# [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
+alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
+
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
+# Print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
