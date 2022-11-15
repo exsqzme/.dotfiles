@@ -192,6 +192,12 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     " LSP
     " steps: install lsp, install language server, configure lsp
     Plug 'neovim/nvim-lspconfig'
+    Plug 'jose-elias-alvarez/null-ls.nvim'
+    " Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua
+    Plug 'simrat39/symbols-outline.nvim'
+    Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
+    " Plug 'williamboman/mason.nvim'
+    " Plug 'williamboman/mason-lspconfig.nvim'
 
     " lsp autocomplete
     Plug 'hrsh7th/nvim-cmp'
@@ -220,6 +226,9 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
     " rust-analyzer
     " Plug 'simrat39/rust-tools.nvim'
 
+    " flutter-tools
+    Plug 'akinsho/flutter-tools.nvim'
+
     " Debugging
     Plug 'mfussenegger/nvim-dap'
     Plug 'leoluz/nvim-dap-go'
@@ -234,9 +243,17 @@ if filereadable(expand("~/.local/share/nvim/site/autoload/plug.vim"))
 
     Plug 'nvim-lualine/lualine.nvim'
     Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'norcalli/nvim-colorizer.lua'
+    Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
+    Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
+
+
     call plug#end()
     syntax enable
     " set background=dark
+    if (has("termguicolors"))
+        set termguicolors     " enable true colors support
+    endif
     colorscheme dracula
     lua require('exsqzme')
 endif
@@ -247,9 +264,6 @@ endif
 filetype plugin indent on
 
 
-if (has("termguicolors"))
-    set termguicolors     " enable true colors support
-endif
 
 
 
@@ -381,19 +395,26 @@ nnoremap <leader>x :silent !chmod +x %<CR>
 nnoremap <leader>pv :Vex<CR>
 
 
-
+" https://github.com/nvim-telescope/telescope.nvim/issues/592
+" airblade/vim-rooter
+" https://github.com/airblade/vim-rooter
 nnoremap <c-p> :Telescope find_files <cr>
+" nnoremap <c-p> :Telescope find_files cwd=%:p:h <cr>
 " telescope bufers
 " telescope live_grep
 
 
 nnoremap <leader><CR> :so ~/.config/nvim/init.vim<CR>
 
+"Get keycode
+"https://vi.stackexchange.com/questions/26611/is-it-possible-to-map-control-forward-slash-with-vim
+
+
 
 " Ctrl+/
 " nnoremap <C-_> :Telescope current_buffer_fuzzy_find sorting_strategy=ascending prompt_position=top <cr>
 "nnoremap <C-_> <cmd>lua require('telescope.builtin').current_buffer_fuzzy_find({ sorting_strategy="ascending", layout_config={ prompt_position="top" } })<cr>
-nnoremap <C-_> <cmd>lua require('exsqzme.telescope.utils').curbuf() <cr>
+nnoremap <C-/> <cmd>lua require('exsqzme.telescope.utils').curbuf() <cr>
 nnoremap <F4> :lua package.loaded.exsqzme = nil <cr>
 "nnoremap <C-k> :cnext<CR>
 "nnoremap <C-j> :cprev<CR>

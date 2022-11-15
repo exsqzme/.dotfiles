@@ -33,9 +33,12 @@ if _have exa; then
     LS_PREFIX="exa --color=always"
     alias ls="$LS_PREFIX --icons -F --group-directories-first"
     alias ll="$LS_PREFIX --icons -abghHliS"
-    #
+
     # List only directories
-    alias lsd="$LS_PREFIX -lD --tree"
+    alias lsd="$LS_PREFIX -lD"
+    alias lsdt="$LS_PREFIX -lDTL"
+
+    alias lst="$LS_PREFIX -lTL"
 else
     distros=(FreeBSD Mac)
     LS_PREFIX="ls --color"
@@ -50,6 +53,7 @@ else
     # List only directories
     alias lsd="$LS_PREFIX -lAF | grep --color=never '^d'"
 fi
+alias lss="ls | grep -i "
 unset LS_PREFIX
 unset distros
 
@@ -135,6 +139,7 @@ alias canary='/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Ch
 
 
 # Enable aliases to be sudo’ed
+# TODO: how does this work?
 alias sudo='sudo '
 
 # Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages

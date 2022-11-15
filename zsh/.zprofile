@@ -22,3 +22,6 @@ _addToPathFront $VOLTA_HOME/bin
 export PYENV_ROOT="$HOME/.pyenv"
 _addToPathFront $PYENV_ROOT/bin
 eval "$(pyenv init --path)"
+
+# {{{ ruby
+eval "$(rbenv init - zsh)"

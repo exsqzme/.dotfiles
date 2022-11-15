@@ -19,7 +19,7 @@ local filetype_attach = setmetatable({
     vim.cmd [[
       augroup lsp_buf_format
         au! BufWritePre <buffer>
-        autocmd BufWritePre <buffer> :lua vim.lsp.buf.formatting_sync()
+        autocmd BufWritePre <buffer> :lua vim.lsp.buf.format()
       augroup END
     ]]
   end,
@@ -37,7 +37,7 @@ local filetype_attach = setmetatable({
     vim.cmd [[
       augroup lsp_buf_format
         au! BufWritePre <buffer>
-        autocmd BufWritePre <buffer> :lua vim.lsp.buf.formatting_sync()
+        autocmd BufWritePre <buffer> :lua vim.lsp.buf.format()
       augroup END
     ]]
   end,
@@ -72,19 +72,23 @@ end
 local custom_attach = function(client)
     local filetype = vim.api.nvim_buf_get_option(0, "filetype")
 
-    buf_nnoremap { "K", vim.lsp.buf.hover }
-    buf_nnoremap { "<C-k>", vim.lsp.buf.signature_help }
-    buf_nnoremap { "gD", vim.lsp.buf.declaration }
-    buf_nnoremap { "gd", vim.lsp.buf.definition }
+    -- Lsp Saga handles these
+    -- buf_nnoremap { "K", vim.lsp.buf.hover }
+    -- buf_nnoremap { "<C-k>", vim.lsp.buf.signature_help }
+    -- buf_nnoremap { "gD", vim.lsp.buf.declaration }
+    -- buf_nnoremap { "gd", vim.lsp.buf.definition }
+    -- buf_nnoremap { "<space>rn", vim.lsp.buf.rename }
+
     buf_nnoremap { "gT", vim.lsp.buf.type_definition }
     -- buf_nnoremap { "gi", vim.lsp.buf.implementation }
     telescope_mapper("gI", "lsp_implementations", nil, true)
     telescope_mapper("gr", "lsp_references", nil, true)
     -- buf_nnoremap { "gr", vim.lsp.buf.references }
-    buf_nnoremap { "<space>rn", vim.lsp.buf.rename }
-    telescope_mapper("<space>ca", "lsp_code_actions", nil, true)
-    -- buf_nnoremap { "<space>ca", vim.lsp.buf.code_action }
-    buf_nnoremap { "<space>f", vim.lsp.buf.formatting }
+    -- telescope_mapper("<space>ca", "lsp_code_actions", nil, true)
+    -- https://github.com/nvim-telescope/telescope.nvim/issues/1470
+    -- https://github.com/nvim-telescope/telescope.nvim/pull/1866
+    buf_nnoremap { "<space>ca", vim.lsp.buf.code_action }
+    buf_nnoremap { "<space>f", vim.lsp.buf.format }
     buf_nnoremap { "]d", vim.diagnostic.goto_next }
     buf_nnoremap { "[d", vim.diagnostic.goto_prev }
     buf_nnoremap { "<space>wa", vim.lsp.buf.add_workspace_folder }
@@ -101,30 +105,36 @@ local custom_attach = function(client)
 
 
     if filetype ~= "lua" then
-        buf_nnoremap { "K", vim.lsp.buf.hover, { desc ="lsp:hover" } }
+        -- buf_nnoremap { "K", vim.lsp.buf.hover, { desc ="lsp:hover" } }
     end
 
     vim.bo.omnifunc = "v:lua.vim.lsp.omnifunc"
 
-    -- Set autocommands conditional on server_capabilities
-    if client.resolved_capabilities.document_highlight then
-        vim.cmd [[
-          augroup lsp_document_highlight
-            autocmd! * <buffer>
-            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-          augroup END
-        ]]
+    if filetype ~= "dart" then
+        -- Set autocommands conditional on server_capabilities
+        if client.server_capabilities.documentHighlightProvider then
+        -- if client.supports_method('textDocument/documentHighlight') then
+        -- if client.server_capabilities.document_highlight then
+            vim.cmd [[
+              augroup lsp_document_highlight
+                autocmd! * <buffer>
+                autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+                autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+              augroup END
+            ]]
+        end
     end
 
-    if client.resolved_capabilities.code_lens then
-        vim.cmd [[
-          augroup lsp_document_codelens
-            au! * <buffer>
-            autocmd BufEnter ++once         <buffer> lua require"vim.lsp.codelens".refresh()
-            autocmd BufWritePost,CursorHold <buffer> lua require"vim.lsp.codelens".refresh()
-          augroup END
-        ]]
+    if client.server_capabilities.codeLensProvider then
+        if filetype ~= "elm" then
+          vim.cmd [[
+            augroup lsp_document_codelens
+              au! * <buffer>
+              autocmd BufEnter ++once         <buffer> lua require"vim.lsp.codelens".refresh()
+              autocmd BufWritePost,CursorHold <buffer> lua require"vim.lsp.codelens".refresh()
+            augroup END
+          ]]
+        end
     end
 
     -- Attach any filetype specific options to the client
@@ -132,16 +142,19 @@ local custom_attach = function(client)
 end 
 
 
-local updated_capabilities = vim.lsp.protocol.make_client_capabilities()
-updated_capabilities = require("cmp_nvim_lsp").update_capabilities(updated_capabilities)
+-- local updated_capabilities = vim.lsp.protocol.make_client_capabilities()
+-- updated_capabilities = require("cmp_nvim_lsp").update_capabilities(updated_capabilities)
+updated_capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 local servers = {
-  graphql = true,
+  -- graphql = true,
   html = true,
   pyright = true,
   -- https://github.com/iamcco/vim-language-server
   -- vimls = true,
   eslint = true,
+
+  clangd = true,
 
   -- Golang
   gopls = {
@@ -191,6 +204,9 @@ local servers = {
             },
             procMacro = {
                 enable = true
+            },
+            checkOnSave = {
+                command = "clippy"
             },
         }
     },
@@ -242,3 +258,10 @@ end
 for server, config in pairs(servers) do
   setup_server(server, config)
 end
+
+
+return {
+    on_init = custom_init,
+    on_attach = custom_attach,
+    capabilities = updated_capabilities,
+}

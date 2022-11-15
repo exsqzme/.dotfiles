@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo "Enter m3u8 link:";read link;echo "Enter output filename:";read filename;ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "$link" -bsf:a aac_adtstoasc -c copy $filename.mp4

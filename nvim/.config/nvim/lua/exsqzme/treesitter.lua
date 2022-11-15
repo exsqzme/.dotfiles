@@ -3,6 +3,9 @@ local treesitter = require('nvim-treesitter.configs')
 treesitter.setup {
     ensure_installed = {
         "bash",
+        "c",
+        "cpp",
+        "dart",
         "dockerfile",
         "go",
         "html",

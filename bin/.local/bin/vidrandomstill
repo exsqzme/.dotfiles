@@ -1,0 +1,10 @@
+#!/bin/bash
+filepath=$(readlink -f "$1");
+loc=$(echo $filepath | sed s'/.\+\/jitzvidz\///');
+# remove everything after last slash
+# loc=$(echo $loc | sed 's![^/]*$!!');
+percent=0.4
+t=$(echo "$2*$percent" | bc)
+img="$loc-still.jpg"
+ffmpeg -ss $t -i "$1" -v quiet -frames:v 1 -q:v 2 "$img"
+echo $img

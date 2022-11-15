@@ -1,0 +1,46 @@
+#!/bin/bash
+filepath=$(readlink -f "$1");
+loc=$(echo $filepath | sed s'/.\+\/jitzvidz\///');
+cover=$(find $filepath -name cover.* | sed s'/.\+\(cover.\+\)/\1/');
+instructors="[";
+while true;
+do
+    read -p "Enter Instructor: " instructor;
+    [[ -z "$instructor" ]] && break;
+    instructors="$instructors\"$instructor\",";
+done
+instructors=$(echo $instructors | sed s'/,$//');
+instructors="$instructors]";
+keywords="[";
+while true;
+do
+    read -p "Enter Keyword: " keyword;
+    [[ -z "$keyword" ]] && break;
+    keywords="$keywords\"$keyword\",";
+done
+keywords=$(echo $keywords | sed s'/,$//');
+keywords="$keywords]";
+isnogi=false;
+echo "Enter isnogi:";
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) isnogi=true; break;;
+        No ) break;;
+    esac
+done
+ismatch=false;
+echo "Enter ismatch:";
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) ismatch=true; break;;
+        No ) break;;
+    esac
+done
+
+for file in $filepath/temp/*.mp4; do
+    file=$(echo $file | sed -E s'/.+\/([^\/]+\.(mp4|webm))/\1/');
+    duration=$(vidlen "$filepath/temp/$file");
+    data="{\"video\":{\"img\":\"$loc/$cover\",\"source\":\"Local\",\"isNogi\":$isnogi,\"isMatch\":$ismatch,\"instructors\":$instructors,\"keywords\":$keywords,\"description\":\"$(echo $file | sed -E s"/.(mp4|webm)//")\",\"url\":\"$loc/$file\",\"duration\":$duration},\"albumCover\":\"$loc/$cover\"}";
+    echo "$data";
+    curl -d "$data" -H "Content-Type: application/json" -X POST https://jitzvidz.local.exsqz.me/api/videos;
+done

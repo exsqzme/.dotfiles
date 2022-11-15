@@ -3,8 +3,8 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 setopt INC_APPEND_HISTORY
-setopt CORRECTALL
-ENABLE_CORRECTION="true"
+# setopt CORRECTALL
+# ENABLE_CORRECTION="true"
 
 # If set, parameter expansion, command substitution and arithmetic expansion are performed in prompts. Substitutions within prompts do not affect the command status.
 # setopt PROMPT_SUBST
