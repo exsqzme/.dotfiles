@@ -27,7 +27,9 @@ function o() {
 		open "$@";
 	fi;
 }
+
 alias cl=clear
+alias rm="rm -i"
 
 if _have exa; then
     LS_PREFIX="exa --color=always"

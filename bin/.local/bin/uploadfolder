@@ -40,6 +40,7 @@ done
 for file in $filepath/*.mp4; do
     file=$(echo $file | sed -E s'/.+\/([^\/]+\.(mp4|webm))/\1/');
     duration=$(vidlen "$filepath/$file");
+    still=$(vidrandomstill "$filepath/$file" "$duration");
     data="{\"video\":{\"img\":\"$loc/$cover\",\"source\":\"Local\",\"isNogi\":$isnogi,\"isMatch\":$ismatch,\"instructors\":$instructors,\"keywords\":$keywords,\"description\":\"$(echo $file | sed -E s"/.(mp4|webm)//")\",\"url\":\"$loc/$file\",\"duration\":$duration}}";
     echo "$data";
     curl -d "$data" -H "Content-Type: application/json" -X POST https://jitzvidz.local.exsqz.me/api/videos;

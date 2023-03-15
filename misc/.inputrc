@@ -39,8 +39,8 @@ set convert-meta off
 # Use Alt/Meta + Delete to delete the preceding word
 "\e[3;3~": kill-word
 
-set editing-mode vi
-$if mode=vi 
-    set keymap vi-insert 
-    "kj": vi-movement-mode # remap escape
-$endif
+# set editing-mode vi
+# $if mode=vi 
+#     set keymap vi-insert 
+#     "kj": vi-movement-mode # remap escape
+# $endif

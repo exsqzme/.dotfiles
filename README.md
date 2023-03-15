@@ -23,3 +23,10 @@ https://github.com/rusty-electron/dotfiles
 https://www.youtube.com/watch?v=BCuyEdDQ5iA
 https://github.com/jonhoo/configs
 https://github.com/hannadrehman/dotfiles/tree/master/nvim
+
+https://github.com/LunarVim/Neovim-from-scratch
+https://github.com/LunarVim/nvim-basic-ide
+https://github.com/ChristianChiarulli/Machfiles
+
+
+https://github.com/bashbunni/dotfiles

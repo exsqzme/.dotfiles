@@ -14,11 +14,13 @@ case $OS in
     export OS="Mac"
     # Install GNU `sed`, overwriting the built-in `sed`.
     # brew install gnu-sed --with-default-names`
+    # TODO: better way "symlink" or "brew link --force xxx"
     PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/fgrep/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/egrep/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/less/libexec/gnubin:$PATH"
+    PATH="/usr/local/opt/libpq/bin:$PATH"
     ;;
   "SunOS")
     export OS="Solaris"
@@ -35,6 +37,7 @@ esac
 
 ENABLE_CORRECTION="true"
 
+SANDBOX=$HOME/dev/sandbox
 EXSQZME=$HOME/dev/github.com/exsqzme
 CONFIGS=$EXSQZME/.dotfiles/zsh/.config/zsh
 DOTFILES=$EXSQZME/.dotfiles
