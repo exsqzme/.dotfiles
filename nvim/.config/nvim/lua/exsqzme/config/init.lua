@@ -15,14 +15,22 @@ local defaults = {
 	defaults = {
 		autocmds = true, -- lazyvim.config.autocmds
 		keymaps = true, -- lazyvim.config.keymaps
-		options = true, -- lazyvim.config.options
+		-- lazyvim.config.options can't be configured here since that's loaded before lazyvim setup
+		-- if you want to disable loading options, add `package.loaded["lazyvim.config.options"] = true` to the top of your init.lua
 	},
 	-- icons used by other plugins
 	icons = {
+		dap = {
+			Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
+			Breakpoint = " ",
+			BreakpointCondition = " ",
+			BreakpointRejected = { " ", "DiagnosticError" },
+			LogPoint = ".>",
+		},
 		diagnostics = {
 			Error = " ",
 			Warn = " ",
-			Hint = " ",
+			Hint = " ",
 			Info = " ",
 		},
 		git = {
@@ -43,7 +51,7 @@ local defaults = {
 			Event = " ",
 			Field = " ",
 			File = " ",
-			Folder = " ",
+			Folder = " ",
 			Function = " ",
 			Interface = " ",
 			Key = " ",
@@ -51,7 +59,7 @@ local defaults = {
 			Method = " ",
 			Module = " ",
 			Namespace = " ",
-			Null = "ﳠ ",
+			Null = " ",
 			Number = " ",
 			Object = " ",
 			Operator = " ",
@@ -68,6 +76,10 @@ local defaults = {
 			Variable = " ",
 		},
 	},
+}
+
+M.renames = {
+	["windwp/nvim-spectre"] = "nvim-pack/nvim-spectre",
 }
 
 ---@type LazyVimConfig
@@ -133,15 +145,16 @@ function M.load(name)
 		end, {
 			msg = "Failed loading " .. mod,
 			on_error = function(msg)
-				local modpath = require("lazy.core.cache").find(mod)
-				if modpath then
-					Util.error(msg)
+				local info = require("lazy.core.cache").find(mod)
+				if info == nil or (type(info) == "table" and #info == 0) then
+					return
 				end
+				Util.error(msg)
 			end,
 		})
 	end
 	-- always load lazyvim, then user file
-	if M.defaults[name] then
+	if M.defaults[name] or name == "options" then
 		_load("exsqzme.config." .. name) -- before we lazyvim.config and used to load default configs
 	end
 	-- _load("config." .. name) -- TODO: used when loading from user overrides
@@ -162,6 +175,14 @@ function M.init()
 		-- this is needed to make sure options will be correctly applied
 		-- after installing missing plugins
 		require("exsqzme.config").load("options")
+		local Plugin = require("lazy.core.plugin")
+		local add = Plugin.Spec.add
+		Plugin.Spec.add = function(self, plugin, ...)
+			if type(plugin) == "table" and M.renames[plugin[1]] then
+				plugin[1] = M.renames[plugin[1]]
+			end
+			return add(self, plugin, ...)
+		end
 	end
 end
 

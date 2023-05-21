@@ -43,6 +43,7 @@ return {
 		},
 		opts = function()
 			local cmp = require("cmp")
+			local luasnip = require("luasnip")
 			return {
 				completion = {
 					completeopt = "menu,menuone,noinsert",
@@ -111,9 +112,7 @@ return {
 	{
 		"echasnovski/mini.pairs",
 		event = "VeryLazy",
-		config = function(_, opts)
-			require("mini.pairs").setup(opts)
-		end,
+		opts = {},
 	},
 
 	-- surround
@@ -148,41 +147,19 @@ return {
 				update_n_lines = "gzn", -- Update `n_lines`
 			},
 		},
-		config = function(_, opts)
-			-- use gz mappings instead of s to prevent conflict with leap
-			require("mini.surround").setup(opts)
-		end,
 	},
 
 	-- comments
-	{ "JoosepAlviste/nvim-ts-context-commentstring", lazy = true },
 	{
 		"numToStr/Comment.nvim",
 		event = "VeryLazy",
-		opts = {
-			hooks = {
-				pre = function()
-					require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook()
-				end,
-			},
-		},
-		config = function(_, opts)
-			require("Comment").setup(opts)
-		end,
+		opts = {},
 	},
 	--[[ {
     "echasnovski/mini.comment",
     event = "VeryLazy",
-    opts = {
-      hooks = {
-        pre = function()
-          require("ts_context_commentstring.internal").update_commentstring({})
-        end,
-      },
-    },
-    config = function(_, opts)
-      require("mini.comment").setup(opts)
-    end,
+    opts = {},
+    main = "mini.comment",
   }, ]]
 
 	-- better text-objects

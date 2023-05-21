@@ -21,6 +21,8 @@ case $OS in
     PATH="/usr/local/opt/egrep/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/less/libexec/gnubin:$PATH"
     PATH="/usr/local/opt/libpq/bin:$PATH"
+    PATH="/usr/local/opt/openjdk/bin:$PATH"
+
     ;;
   "SunOS")
     export OS="Solaris"

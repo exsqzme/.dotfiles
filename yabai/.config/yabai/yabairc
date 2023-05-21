@@ -53,8 +53,11 @@ yabai -m config external_bar 		        all:30:0
 # manage = window should be managed vs float
 # https://github.com/koekeishiya/yabai/blob/master/doc/yabai.asciidoc#rule
 yabai -m rule --add app="^Finder$" manage=off border=off grid=4:4:1:1:2:2
+yabai -m rule --add app="^Preview$" manage=off border=off grid=4:4:1:1:2:2
 yabai -m rule --add app="^1Password$" manage=off border=off grid=4:4:1:1:2:2
+yabai -m rule --add app="^Messages$" manage=off border=off grid=4:4:1:1:2:2
 yabai -m rule --add app="^System Settings$" manage=off border=off grid=4:4:1:1:2:2
+yabai -m rule --add app="^E-book Viewer$" manage=off border=off grid=4:4:1:1:2:2
 # yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
 # yabai -m rule --add label="macfeh" app="^macfeh$" manage=off
 yabai -m rule --add app="^System Preferences$" title=".*" manage=off border=off grid=4:4:1:1:2:2

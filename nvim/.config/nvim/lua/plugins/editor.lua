@@ -66,11 +66,22 @@ return {
 				},
 			},
 		},
+		config = function(_, opts)
+			require("neo-tree").setup(opts)
+			vim.api.nvim_create_autocmd("TermClose", {
+				pattern = "*lazygit",
+				callback = function()
+					if package.loaded["neo-tree.sources.git_status"] then
+						require("neo-tree.sources.git_status").refresh()
+					end
+				end,
+			})
+		end,
 	},
 
 	-- search/replace in multiple files
 	{
-		"windwp/nvim-spectre",
+		"nvim-pack/nvim-spectre",
     -- stylua: ignore
     keys = {
       { "<leader>sr", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
@@ -97,7 +108,7 @@ return {
 		version = false, -- telescope did only one release, so use HEAD for now
 		keys = {
 			{ "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "Switch Buffer" },
-			{ "<leader>/", Util.telescope("live_grep"), desc = "Find in Files (Grep)" },
+			{ "<leader>/", Util.telescope("live_grep"), desc = "Grep (root dir)" },
 			{ "<leader>:", "<cmd>Telescope command_history<cr>", desc = "Command History" },
 			{ "<leader><space>", Util.telescope("files"), desc = "Find Files (root dir)" },
 			-- find
@@ -105,6 +116,7 @@ return {
 			{ "<leader>ff", Util.telescope("files"), desc = "Find Files (root dir)" },
 			{ "<leader>fF", Util.telescope("files", { cwd = false }), desc = "Find Files (cwd)" },
 			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent" },
+			{ "<leader>fR", Util.telescope("oldfiles", { cwd = vim.loop.cwd() }), desc = "Recent (cwd)" },
 			-- git
 			{ "<leader>gc", "<cmd>Telescope git_commits<CR>", desc = "commits" },
 			{ "<leader>gs", "<cmd>Telescope git_status<CR>", desc = "status" },
@@ -113,7 +125,8 @@ return {
 			{ "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Buffer" },
 			{ "<leader>sc", "<cmd>Telescope command_history<cr>", desc = "Command History" },
 			{ "<leader>sC", "<cmd>Telescope commands<cr>", desc = "Commands" },
-			{ "<leader>sd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
+			{ "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "Document diagnostics" },
+			{ "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "Workspace diagnostics" },
 			{ "<leader>sg", Util.telescope("live_grep"), desc = "Grep (root dir)" },
 			{ "<leader>sG", Util.telescope("live_grep", { cwd = false }), desc = "Grep (cwd)" },
 			{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
@@ -150,7 +163,7 @@ return {
 			},
 			{
 				"<leader>sS",
-				Util.telescope("lsp_workspace_symbols", {
+				Util.telescope("lsp_dynamic_workspace_symbols", {
 					symbols = {
 						"Class",
 						"Function",
@@ -180,10 +193,14 @@ return {
 							return require("trouble.providers.telescope").open_selected_with_trouble(...)
 						end,
 						["<a-i>"] = function()
-							Util.telescope("find_files", { no_ignore = true })()
+							local action_state = require("telescope.actions.state")
+							local line = action_state.get_current_line()
+							Util.telescope("find_files", { no_ignore = true, default_text = line })()
 						end,
 						["<a-h>"] = function()
-							Util.telescope("find_files", { hidden = true })()
+							local action_state = require("telescope.actions.state")
+							local line = action_state.get_current_line()
+							Util.telescope("find_files", { hidden = true, default_text = line })()
 						end,
 						["<C-Down>"] = function(...)
 							return require("telescope.actions").cycle_history_next(...)
@@ -252,11 +269,7 @@ return {
 		event = "VeryLazy",
 		opts = {
 			plugins = { spelling = true },
-		},
-		config = function(_, opts)
-			local wk = require("which-key")
-			wk.setup(opts)
-			local keymaps = {
+			defaults = {
 				mode = { "n", "v" },
 				["g"] = { name = "+goto" },
 				["gz"] = { name = "+surround" },
@@ -273,11 +286,12 @@ return {
 				["<leader>u"] = { name = "+ui" },
 				["<leader>w"] = { name = "+windows" },
 				["<leader>x"] = { name = "+diagnostics/quickfix" },
-			}
-			if Util.has("noice.nvim") then
-				keymaps["<leader>sn"] = { name = "+noice" }
-			end
-			wk.register(keymaps)
+			},
+		},
+		config = function(_, opts)
+			local wk = require("which-key")
+			wk.setup(opts)
+			wk.register(opts.defaults)
 		end,
 	},
 
@@ -406,13 +420,14 @@ return {
 		cmd = { "TodoTrouble", "TodoTelescope" },
 		event = { "BufReadPost", "BufNewFile" },
 		config = true,
-    -- stylua: ignore
-    keys = {
-      { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-      { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
-      { "<leader>xt", "<cmd>TodoTrouble<cr>", desc = "Todo (Trouble)" },
-      { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
-      { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
-    },
+        -- stylua: ignore
+        keys = {
+            { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+            { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
+            { "<leader>xt", "<cmd>TodoTrouble<cr>", desc = "Todo (Trouble)" },
+            { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
+            { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
+            { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
+        },
 	},
 }
