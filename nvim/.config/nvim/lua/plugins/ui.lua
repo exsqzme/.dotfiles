@@ -72,12 +72,12 @@ return {
 		opts = function()
 			local dashboard = require("alpha.themes.dashboard")
 			local logo = [[
-      ██╗      █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          Z
-      ██║     ██╔══██╗╚══███╔╝╚██╗ ██╔╝██║   ██║██║████╗ ████║      Z    
-      ██║     ███████║  ███╔╝  ╚████╔╝ ██║   ██║██║██╔████╔██║   z       
-      ██║     ██╔══██║ ███╔╝    ╚██╔╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ z         
-      ███████╗██║  ██║███████╗   ██║    ╚████╔╝ ██║██║ ╚═╝ ██║
-      ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝     ╚═══╝  ╚═╝╚═╝     ╚═╝
+           ██╗      █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          Z
+           ██║     ██╔══██╗╚══███╔╝╚██╗ ██╔╝██║   ██║██║████╗ ████║      Z    
+           ██║     ███████║  ███╔╝  ╚████╔╝ ██║   ██║██║██╔████╔██║   z       
+           ██║     ██╔══██║ ███╔╝    ╚██╔╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ z         
+           ███████╗██║  ██║███████╗   ██║    ╚████╔╝ ██║██║ ╚═╝ ██║
+           ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝     ╚═══╝  ╚═╝╚═╝     ╚═╝
       ]]
 
 			dashboard.section.header.val = vim.split(logo, "\n")
@@ -179,7 +179,18 @@ return {
 		opts = {
 			-- char = "▏",
 			char = "│",
-			filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason" },
+			pattern = {
+				"help",
+				"alpha",
+				"dashboard",
+				"neo-tree",
+				"Trouble",
+				"lazy",
+				"mason",
+				"notify",
+				"toggleterm",
+				"lazyterm",
+			},
 			show_trailing_blankline_indent = false,
 			show_current_context = false,
 		},
@@ -187,20 +198,16 @@ return {
 
 	-- noicer ui
 	{
+		"folke/which-key.nvim",
+		opts = function(_, opts)
+			if require("exsqzme.util").has("noice.nvim") then
+				opts.defaults["<leader>sn"] = { name = "+noice" }
+			end
+		end,
+	},
+	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
-		dependencies = {
-			-- which key integration
-			{
-				"folke/which-key.nvim",
-				opts = function(_, opts)
-					local Util = require("exsqzme.util")
-					if Util.has("noice.nvim") then
-						opts.defaults["<leader>sn"] = { name = "+noice" }
-					end
-				end,
-			},
-		},
 		opts = {
 			lsp = {
 				override = {
@@ -213,7 +220,11 @@ return {
 				{
 					filter = {
 						event = "msg_show",
-						find = "%d+L, %d+B",
+						any = {
+							{ find = "%d+L, %d+B" },
+							{ find = "; after #%d+" },
+							{ find = "; before #%d+" },
+						},
 					},
 					view = "mini",
 				},

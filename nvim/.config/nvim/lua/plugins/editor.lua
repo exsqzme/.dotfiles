@@ -43,6 +43,8 @@ return {
 			end
 		end,
 		opts = {
+			sources = { "filesystem", "buffers", "git_status", "document_symbols" },
+			open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "Outline" },
 			filesystem = {
 				bind_to_cwd = false,
 				follow_current_file = true,
@@ -64,6 +66,16 @@ return {
 					expander_expanded = "",
 					expander_highlight = "NeoTreeExpander",
 				},
+				icon = {
+					folder_empty = "󰜌",
+					folder_empty_open = "󰜌",
+				},
+				git_status = {
+					symbols = {
+						renamed = "󰁕",
+						unstaged = "󰄱",
+					},
+				},
 			},
 		},
 		config = function(_, opts)
@@ -82,10 +94,12 @@ return {
 	-- search/replace in multiple files
 	{
 		"nvim-pack/nvim-spectre",
-    -- stylua: ignore
-    keys = {
-      { "<leader>sr", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
-    },
+		cmd = "Spectre",
+		opts = { open_cmd = "noswapfile vnew" },
+        -- stylua: ignore
+        keys = {
+            { "<leader>sr", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
+        },
 	},
 
 	-- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -104,6 +118,7 @@ return {
 	-- fuzzy finder
 	{
 		"nvim-telescope/telescope.nvim",
+		commit = vim.fn.has("nvim-0.9.0") == 0 and "057ee0f8783" or nil,
 		cmd = "Telescope",
 		version = false, -- telescope did only one release, so use HEAD for now
 		keys = {
@@ -232,34 +247,79 @@ return {
 		end,
 	},
 
-	-- easily jump to any location and enhanced f/t motions for Leap
-	{
-		"ggandor/flit.nvim",
-		keys = function()
-			---@type LazyKeys[]
-			local ret = {}
-			for _, key in ipairs({ "f", "F", "t", "T" }) do
-				ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-			end
-			return ret
-		end,
-		opts = { labeled_modes = "nx" },
-	},
+	-- disable old installations of leap and flit. Optional so it doesn't appear under disabled plugins
 	{
 		"ggandor/leap.nvim",
+		enabled = function()
+			vim.schedule(function()
+				local Config = require("lazy.core.config")
+				if Config.spec.disabled["leap.nvim"] or Config.spec.disabled["flit.nvim"] then
+					require("lazy.core.util").warn(
+						[[`flash.nvim` is now the default **LazyVim** jump plugin.
+**leap.nvim** and **flit.nvim** have been disabled.
+Please remove the plugins from your config.
+If you rather use leap/flit instead, you can add the leap extra:
+`lazyvim.plugins.extras.editor.leap`
+]],
+						{ title = "LazyVim" }
+					)
+				end
+			end)
+			return false
+		end,
+		optional = true,
+	},
+	{ "ggandor/flit.nvim", enabled = false, optional = true },
+
+	-- Add Flash
+	{
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		vscode = true,
+		---@type Flash.Config
+		opts = {},
+        -- stylua: ignore
 		keys = {
-			{ "s", mode = { "n", "x", "o" }, desc = "Leap forward to" },
-			{ "S", mode = { "n", "x", "o" }, desc = "Leap backward to" },
-			{ "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+            { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+            { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+            { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
 		},
-		config = function(_, opts)
-			local leap = require("leap")
-			for k, v in pairs(opts) do
-				leap.opts[k] = v
+	},
+
+	-- Flash Telescope config
+	{
+		"nvim-telescope/telescope.nvim",
+		optional = true,
+		opts = function(_, opts)
+			if not require("exsqzme.util").has("flash.nvim") then
+				return
 			end
 			leap.add_default_mappings(true)
 			vim.keymap.del({ "x", "o" }, "x")
 			vim.keymap.del({ "x", "o" }, "X")
+			local function flash(prompt_bufnr)
+				require("flash").jump({
+					pattern = "^",
+					label = { after = { 0, 0 } },
+					search = {
+						mode = "search",
+						exclude = {
+							function(win)
+								return vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "TelescopeResults"
+							end,
+						},
+					},
+					action = function(match)
+						local picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+						picker:set_selection(match.pos[1] - 1)
+					end,
+				})
+			end
+			opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
+				mappings = { n = { s = flash }, i = { ["<c-s>"] = flash } },
+			})
 		end,
 	},
 
@@ -341,7 +401,13 @@ return {
 	{
 		"RRethy/vim-illuminate",
 		event = { "BufReadPost", "BufNewFile" },
-		opts = { delay = 200 },
+		opts = {
+			delay = 200,
+			large_file_cutoff = 2000,
+			large_file_overrides = {
+				providers = { "lsp" },
+			},
+		},
 		config = function(_, opts)
 			require("illuminate").configure(opts)
 
@@ -395,7 +461,10 @@ return {
 					if require("trouble").is_open() then
 						require("trouble").previous({ skip_groups = true, jump = true })
 					else
-						vim.cmd.cprev()
+						local ok, err = pcall(vim.cmd.cprev)
+						if not ok then
+							vim.notify(err, vim.log.levels.ERROR)
+						end
 					end
 				end,
 				desc = "Previous trouble/quickfix item",
@@ -406,7 +475,10 @@ return {
 					if require("trouble").is_open() then
 						require("trouble").next({ skip_groups = true, jump = true })
 					else
-						vim.cmd.cnext()
+						local ok, err = pcall(vim.cmd.cnext)
+						if not ok then
+							vim.notify(err, vim.log.levels.ERROR)
+						end
 					end
 				end,
 				desc = "Next trouble/quickfix item",

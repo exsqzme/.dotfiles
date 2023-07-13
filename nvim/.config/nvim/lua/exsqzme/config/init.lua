@@ -8,6 +8,7 @@ local defaults = {
 	-- colorscheme can be a string like `catppuccin` or a function that will load the colorscheme
 	---@type string|fun()
 	colorscheme = "dracula",
+	-- "dracula",
 	--[[ function()
 		require("tokyonight").load()
 	end, ]]
@@ -162,6 +163,8 @@ function M.load(name)
 		-- HACK: LazyVim may have overwritten options of the Lazy ui, so reset this here
 		vim.cmd([[do VimResized]])
 	end
+	local pattern = "exsqzme" .. name:sub(1, 1):upper() .. name:sub(2)
+	vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
 end
 
 M.did_init = false

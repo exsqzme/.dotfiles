@@ -14,9 +14,8 @@ fi
 # {{{ Rust
 _addToPathFront $HOME/.cargo/bin
 
-# {{{ Volta (node / yarn)
-export VOLTA_HOME="$HOME/.volta"
-_addToPathFront $VOLTA_HOME/bin
+# {{{ Node
+eval "$(fnm env --use-on-cd)"
 
 # {{{ Pyenv
 export PYENV_ROOT="$HOME/.pyenv"

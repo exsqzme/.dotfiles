@@ -4,8 +4,8 @@ return {
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
-			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-			{ "folke/neodev.nvim", opts = { experimental = { pathStrict = true } } },
+			{ "folke/neoconf.nvim", cmd = "Neoconf", config = false, dependencies = { "nvim-lspconfig" } },
+			{ "folke/neodev.nvim", opts = {} },
 			"mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
 			{
@@ -24,10 +24,19 @@ return {
 				virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
 				severity_sort = true,
 			},
+			-- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
+			-- Be aware that you also will need to properly configure your LSP server to
+			-- provide the inlay hints.
+			inlay_hints = {
+				enabled = false,
+			},
 			-- add any global capabilities here
 			capabilities = {},
 			-- Automatically format on save
 			autoformat = true,
+			-- Enable this to show formatters used in a notification
+			-- Useful for debugging formatter issues
+			format_notify = false,
 			-- options for vim.lsp.buf.format
 			-- `bufnr` and `filter` is handled by the LazyVim formatter,
 			-- but can be also overridden when specified
@@ -40,6 +49,10 @@ return {
 			servers = {
 				lua_ls = {
 					-- mason = false, -- set to false if you don't want this server to be installed with mason
+					-- Use this to add any additional keymaps
+					-- for specific lsp servers
+					---@type LazyKeys[]
+					-- keys = {},
 					settings = {
 						Lua = {
 							workspace = {
@@ -52,8 +65,6 @@ return {
 						},
 					},
 				},
-				svelte = {},
-				rust_analyzer = {},
 			},
 			-- you can do any additional lsp server setup here
 			-- return true if you don't want this server to be setup with lspconfig
@@ -71,6 +82,12 @@ return {
 		---@param opts PluginLspOpts
 		config = function(_, opts)
 			local Util = require("exsqzme.util")
+
+			if Util.has("neoconf.nvim") then
+				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
+				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
+			end
+
 			-- setup autoformat
 			require("plugins.lsp.format").autoformat = opts.autoformat
 			-- setup formatting and keymaps
@@ -79,10 +96,32 @@ return {
 				require("plugins.lsp.keymaps").on_attach(client, buffer)
 			end)
 
+			local register_capability = vim.lsp.handlers["client/registerCapability"]
+
+			vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
+				local ret = register_capability(err, res, ctx)
+				local client_id = ctx.client_id
+				---@type lsp.Client
+				local client = vim.lsp.get_client_by_id(client_id)
+				local buffer = vim.api.nvim_get_current_buf()
+				require("lazyvim.plugins.lsp.keymaps").on_attach(client, buffer)
+				return ret
+			end
+
 			-- diagnostics
 			for name, icon in pairs(require("exsqzme.config").icons.diagnostics) do
 				name = "DiagnosticSign" .. name
 				vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+			end
+
+			local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+
+			if opts.inlay_hints.enabled and inlay_hint then
+				Util.on_attach(function(client, buffer)
+					if client.server_capabilities.inlayHintProvider then
+						inlay_hint(buffer, true)
+					end
+				end)
 			end
 
 			if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
@@ -100,11 +139,12 @@ return {
 			vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
 			local servers = opts.servers
+			local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 			local capabilities = vim.tbl_deep_extend(
 				"force",
 				{},
 				vim.lsp.protocol.make_client_capabilities(),
-				require("cmp_nvim_lsp").default_capabilities(),
+				has_cmp and cmp_nvim_lsp.default_capabilities() or {},
 				opts.capabilities or {}
 			)
 
@@ -146,8 +186,7 @@ return {
 			end
 
 			if have_mason then
-				mlsp.setup({ ensure_installed = ensure_installed })
-				mlsp.setup_handlers({ setup })
+				mlsp.setup({ ensure_installed = ensure_installed, handlers = { setup } })
 			end
 
 			if Util.lsp_get_config("denols") and Util.lsp_get_config("tsserver") then

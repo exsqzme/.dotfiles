@@ -35,10 +35,18 @@ require("lazy").setup({
 		-- { import = "plugins.extras.linting.eslint" },
 		{ import = "plugins.extras.lang.typescript" },
 		{ import = "plugins.extras.lang.tailwindcss" },
+		{ import = "plugins.extras.lang.svelte" },
 		{ import = "plugins.extras.lang.json" },
 		{ import = "plugins.extras.lang.java" },
+		{ import = "plugins.extras.lang.go" },
+		{ import = "plugins.extras.lang.c" },
+		{ import = "plugins.extras.lang.rust" },
+		{ import = "plugins.extras.lang.python" },
 		{ import = "plugins.extras.dap.core" },
+		-- { import = "plugins.extras.dap.nlua" },
+		{ import = "plugins.extras.test.core" },
 		{ import = "plugins.extras.util.project" },
+		{ import = "plugins.extras.vscode" },
 	},
 	defaults = {
 		-- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
@@ -50,7 +58,7 @@ require("lazy").setup({
 		-- version = "*", -- try installing the latest stable version for plugins that support semver
 		-- version = nil, -- default (is this same as false?)
 	},
-	install = { colorscheme = { "dracula", "habamax" } },
+	-- install = { colorscheme = { "dracula", "habamax" } },
 	checker = { enabled = true }, -- automatically check for plugin updates
 	performance = {
 		rtp = {

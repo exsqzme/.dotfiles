@@ -7,7 +7,7 @@
 
 # kickstart yabai 
 # cmd + alt - y : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
-cmd + alt - y : brew services restart skhd
+cmd + alt - y : skhd --restart-service
 
 # lock screen immediately
 cmd - escape : pmset displaysleepnow 
@@ -26,7 +26,9 @@ cmd + shift - s : osascript -e 'tell application "System Events" to sleep'
 
 # === launch commands ===
 # open kitty terminal, blazingly fast compared to iTerm/Hyper
-cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
+cmd - return : open -a /Applications/kitty.app/Contents/MacOS/kitty
+# cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
+cmd + shift - return : open -a /Applications/Obsidian.app/Contents/MacOS/Obsidian
 
 # open firefox
 # cmd + shift - return : open -na "Google Chrome"
@@ -75,8 +77,10 @@ shift + alt - t : \
     yabai -m window --toggle float --grid 4:4:1:1:2:2; \
     yabai -m window --toggle border
 
+shift + alt - b : yabai -m window --toggle border
+
 # toggle sticky
-# shift + alt - s : yabai -m window --toggle sticky;
+shift + alt - p : yabai -m window --toggle sticky --toggle topmost;
 
 # toggle stay on top
 # shift + alt - t : yabai -m window --toggle topmost;
@@ -108,7 +112,7 @@ shift + alt - right  : yabai -m window --grid 1:2:1:0:1:1
 shift + alt - down : yabai -m window --grid 4:4:1:1:2:2
 
 # toggle sticky, float and resize to picture-in-picture size
-shift + alt - p : yabai -m window --toggle sticky --toggle topmost --grid 5:5:4:0:1:1
+# shift + alt - p : yabai -m window --grid 5:5:4:0:1:1
 
 
 
@@ -119,6 +123,9 @@ alt - f : yabai -m window --toggle zoom-parent
 
 # toggle window fullscreen zoom
 shift + alt - f : yabai -m window --toggle zoom-fullscreen
+
+# minimize window
+shift + alt - m : yabai -m window --minimize
 
 # toggle window native fullscreen
 # shift + alt - f : yabai -m window --toggle native-fullscreen

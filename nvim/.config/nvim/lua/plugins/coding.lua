@@ -4,7 +4,7 @@ return {
 	{
 		"L3MON4D3/LuaSnip",
 		build = (not jit.os:find("Windows"))
-				and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+				and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
 			or nil,
 		dependencies = {
 			"rafamadriz/friendly-snippets",
@@ -42,7 +42,9 @@ return {
 			"saadparwaiz1/cmp_luasnip",
 		},
 		opts = function()
+			vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 			local cmp = require("cmp")
+			local defaults = require("cmp.config.default")()
 			local luasnip = require("luasnip")
 			return {
 				completion = {
@@ -101,9 +103,10 @@ return {
 				},
 				experimental = {
 					ghost_text = {
-						hl_group = "LspCodeLens",
+						hl_group = "CmpGhostText",
 					},
 				},
+				sorting = defaults.sorting,
 			}
 		end,
 	},
@@ -188,7 +191,7 @@ return {
 		config = function(_, opts)
 			require("mini.ai").setup(opts)
 			-- register all text objects with which-key
-			if require("exsqzme.util").has("which-key.nvim") then
+			require("exsqzme.util").on_load("which-key.nvim", function()
 				---@type table<string, string|table>
 				local i = {
 					[" "] = "Whitespace",
@@ -229,7 +232,7 @@ return {
 					i = i,
 					a = a,
 				})
-			end
+			end)
 		end,
 	},
 }
