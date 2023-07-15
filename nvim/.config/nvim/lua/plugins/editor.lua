@@ -296,9 +296,6 @@ If you rather use leap/flit instead, you can add the leap extra:
 			if not require("exsqzme.util").has("flash.nvim") then
 				return
 			end
-			leap.add_default_mappings(true)
-			vim.keymap.del({ "x", "o" }, "x")
-			vim.keymap.del({ "x", "o" }, "X")
 			local function flash(prompt_bufnr)
 				require("flash").jump({
 					pattern = "^",
