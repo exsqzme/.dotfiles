@@ -1,0 +1,29 @@
+update/upgrade
+install ansible
+set up ssh key for git
+set git global name and email
+
+clone .dotfiles repo
+get stow
+install .dotfiles
+
+install zsh
+download nerdfont
+install nerdfont
+chsh zsh
+install starship
+
+add unstable ppa nvim
+install nvim
+
+install tmux
+install tpm
+
+#see tasks in ansible for what to get also and readmes
+install rust, go, pyenv??
+install tools needed (no longer need lsp etc cuz mason)
+
+# done
+install fzf xclip tldr ripgrep fd-find lynx bat exa
+
+install kitty
