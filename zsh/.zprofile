@@ -1,26 +1,14 @@
 # {{{ Go
-if [ -d /usr/local/go/bin/ ]; then
-  export GOPATH=~/dev/go
-  export GOBIN="$GOPATH/bin"
-  _addToPathFront $GOBIN
-  _addToPathFront /usr/local/go/bin
-elif [ -d ~/.go/bin/ ]; then
-  export GOPATH="$HOME/.gopath"
-  export GOROOT="$HOME/.go"
-  export GOBIN="$GOPATH/bin"
-  _addToPathFront $GOPATH/bin
-fi
+source $XDG_CONFIG_HOME/zsh/go.zsh
 
 # {{{ Rust
-_addToPathFront $HOME/.cargo/bin
+source $XDG_CONFIG_HOME/zsh/rust.zsh
 
 # {{{ Node
-eval "$(fnm env --use-on-cd)"
+source $XDG_CONFIG_HOME/zsh/node.zsh
 
 # {{{ Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-_addToPathFront $PYENV_ROOT/bin
-eval "$(pyenv init --path)"
+source $XDG_CONFIG_HOME/zsh/pyenv.zsh
 
 # {{{ ruby
-eval "$(rbenv init - zsh)"
+source $XDG_CONFIG_HOME/zsh/ruby.zsh

@@ -6,7 +6,7 @@ return {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		cmd = "Neotree",
-		-- branch = 'v2.x',
+		-- branch = 'v3.x',
 		-- dependencies = {
 		--   'nvim-lua/plenary.nvim',
 		--   'MunifTanjim/nui.nvim',
@@ -34,7 +34,6 @@ return {
 			vim.cmd([[Neotree close]])
 		end,
 		init = function()
-			vim.g.neo_tree_remove_legacy_commands = 1
 			if vim.fn.argc() == 1 then
 				local stat = vim.loop.fs_stat(vim.fn.argv(0))
 				if stat and stat.type == "directory" then
@@ -47,7 +46,7 @@ return {
 			open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "Outline" },
 			filesystem = {
 				bind_to_cwd = false,
-				follow_current_file = true,
+				follow_current_file = { enabled = true },
 				-- hijack_netrw_behavior = 'open_current',
 				filtered_items = {
 					hide_dotfiles = false,
@@ -65,16 +64,6 @@ return {
 					expander_collapsed = "",
 					expander_expanded = "",
 					expander_highlight = "NeoTreeExpander",
-				},
-				icon = {
-					folder_empty = "󰜌",
-					folder_empty_open = "󰜌",
-				},
-				git_status = {
-					symbols = {
-						renamed = "󰁕",
-						unstaged = "󰄱",
-					},
 				},
 			},
 		},
