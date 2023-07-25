@@ -17,6 +17,14 @@ return {
 				gopls = {
 					settings = {
 						gopls = {
+							keys = {
+								-- Workaround for the lack of a DAP strategy in neotest-go: https://github.com/nvim-neotest/neotest-go/issues/12
+								{
+									"<leader>td",
+									"<cmd>lua require('dap-go').debug_test()<CR>",
+									desc = "Debug Nearest (Go)",
+								},
+							},
 							gofumpt = true,
 							codelenses = {
 								gc_details = false,
@@ -105,6 +113,10 @@ return {
 						{ "gomodifytags", "impl", "gofumpt", "goimports-reviser", "delve" }
 					)
 				end,
+			},
+			{
+				"leoluz/nvim-dap-go",
+				config = true,
 			},
 		},
 	},
