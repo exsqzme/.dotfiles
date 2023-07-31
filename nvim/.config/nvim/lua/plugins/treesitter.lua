@@ -41,6 +41,7 @@ return {
 				"tsx",
 				"html",
 				"css",
+				"jsdoc",
 				"json",
 				"markdown",
 				"markdown_inline",
