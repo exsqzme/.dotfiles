@@ -21,6 +21,9 @@ local defaults = {
 	},
 	-- icons used by other plugins
 	icons = {
+		misc = {
+			dots = "󰇘",
+		},
 		dap = {
 			Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
 			Breakpoint = " ",
@@ -46,7 +49,7 @@ local defaults = {
 			Color = " ",
 			Constant = " ",
 			Constructor = " ",
-			Copilot = " ",
+			Copilot = " ",
 			Enum = " ",
 			EnumMember = " ",
 			Event = " ",
@@ -81,6 +84,8 @@ local defaults = {
 
 M.renames = {
 	["windwp/nvim-spectre"] = "nvim-pack/nvim-spectre",
+	["jose-elias-alvarez/null-ls.nvim"] = "nvimtools/none-ls.nvim",
+	["null-ls.nvim"] = "none-ls.nvim",
 }
 
 ---@type LazyVimConfig
@@ -89,6 +94,21 @@ local options
 ---@param opts? LazyVimConfig
 function M.setup(opts)
 	options = vim.tbl_deep_extend("force", defaults, opts or {})
+
+	if vim.fn.has("nvim-0.9.0") == 0 then
+		vim.api.nvim_echo({
+			{
+				"LazyVim requires Neovim >= 0.9.0\n",
+				"ErrorMsg",
+			},
+			{ "Press any key to exit", "MoreMsg" },
+		}, true, {})
+
+		vim.fn.getchar()
+		vim.cmd([[quit]])
+		return
+	end
+
 	if not M.has() then
 		require("lazy.core.util").error(
 			"**LazyVim** needs **lazy.nvim** version "
@@ -99,22 +119,26 @@ function M.setup(opts)
 		)
 		error("Exiting")
 	end
-
-	if vim.fn.argc(-1) == 0 then
-		-- autocmds and keymaps can wait to load
-		vim.api.nvim_create_autocmd("User", {
-			group = vim.api.nvim_create_augroup("exsqzme", { clear = true }),
-			pattern = "VeryLazy",
-			callback = function()
-				M.load("autocmds")
-				M.load("keymaps")
-			end,
-		})
-	else
-		-- load them now so they affect the opened buffers
+	-- autocmds can be loaded lazily when not opening a file
+	local lazy_autocmds = vim.fn.argc(-1) == 0
+	if not lazy_autocmds then
 		M.load("autocmds")
 		M.load("keymaps")
 	end
+
+	local group = vim.api.nvim_create_augroup("LazyVim", { clear = true })
+	vim.api.nvim_create_autocmd("User", {
+		group = group,
+		pattern = "VeryLazy",
+		callback = function()
+			if lazy_autocmds then
+				M.load("autocmds")
+			end
+			M.load("keymaps")
+		end,
+	})
+
+	M.lazy_file()
 
 	require("lazy.core.util").try(function()
 		if type(M.colorscheme) == "function" then
@@ -127,6 +151,41 @@ function M.setup(opts)
 		on_error = function(msg)
 			require("lazy.core.util").error(msg)
 			vim.cmd.colorscheme("habamax")
+		end,
+	})
+end
+
+-- Properly load file based plugins without blocking the UI
+function M.lazy_file()
+	local events = {} ---@type {event: string, pattern?: string, buf: number, data?: any}[]
+
+	local function load()
+		if #events == 0 then
+			return
+		end
+		vim.api.nvim_del_augroup_by_name("lazy_file")
+		vim.api.nvim_exec_autocmds("User", { pattern = "LazyFile", modeline = false })
+		for _, event in ipairs(events) do
+			vim.api.nvim_exec_autocmds(event.event, {
+				pattern = event.pattern,
+				modeline = false,
+				buffer = event.buf,
+				data = { lazy_file = true },
+			})
+		end
+		vim.api.nvim_exec_autocmds("CursorMoved", { modeline = false })
+		events = {}
+	end
+
+	-- schedule wrap so that nested autocmds are executed
+	-- and the UI can continue rendering without blocking
+	load = vim.schedule_wrap(load)
+
+	vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "BufNewFile" }, {
+		group = vim.api.nvim_create_augroup("lazy_file", { clear = true }),
+		callback = function(event)
+			table.insert(events, event)
+			load()
 		end,
 	})
 end
@@ -182,9 +241,25 @@ function M.init()
 		local add = Plugin.Spec.add
 		Plugin.Spec.add = function(self, plugin, ...)
 			if type(plugin) == "table" and M.renames[plugin[1]] then
+				require("lazy.core.util").warn(
+					("Plugin `%s` was renamed to `%s`.\nPlease update your config for `%s`"):format(
+						plugin[1],
+						M.renames[plugin[1]],
+						self.importing or "LazyVim"
+					),
+					{ title = "LazyVim" }
+				)
 				plugin[1] = M.renames[plugin[1]]
 			end
 			return add(self, plugin, ...)
+		end
+
+		-- Add support for the LazyFile event
+		local Event = require("lazy.core.handler.event")
+		local _event = Event._event
+		---@diagnostic disable-next-line: duplicate-set-field
+		Event._event = function(self, value)
+			return value == "LazyFile" and "User LazyFile" or _event(self, value)
 		end
 	end
 end

@@ -22,7 +22,7 @@ opt.formatoptions = "jcroqlnt" -- tcqj
 opt.grepformat = "%f:%l:%c:%m"
 opt.grepprg = "rg --vimgrep"
 opt.inccommand = "nosplit" -- preview incremental substitute
-opt.laststatus = 0
+opt.laststatus = 3 -- global statusline
 opt.list = true -- Show some invisible characters (tabs...
 opt.guicursor = "" -- cursor style
 opt.mouse = "a" -- Enable mouse mode
@@ -34,7 +34,7 @@ opt.scrolloff = 8 -- Lines of context
 opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize" }
 opt.shiftround = true -- Round indent
 opt.shiftwidth = 4 -- Size of an indent
-opt.shortmess:append({ W = true, I = true, c = true })
+opt.shortmess:append({ W = true, I = true, c = true, C = true })
 opt.showmode = false -- Dont show mode since we have a statusline
 opt.sidescrolloff = 8 -- Columns of context
 opt.signcolumn = "yes" -- Always show the signcolumn, otherwise it would shift the text each time
@@ -43,6 +43,7 @@ opt.smartcase = true -- Don't ignore case with capitals
 opt.smartindent = true -- Insert indents automatically
 opt.spelllang = { "en" }
 opt.splitbelow = true -- Put new windows below current
+opt.splitkeep = "screen"
 opt.splitright = true -- Put new windows right of current
 opt.tabstop = 4 -- Number of spaces tabs count for
 opt.softtabstop = 4 -- INFO: defaults to 0, maybe is better
@@ -62,10 +63,15 @@ opt.isfname:append("@-@")
 opt.wildignore = opt.wildignore + "*.o,*~,*.pyc" -- Ignore compiled files
 -- opt.cmdheight = 0 -- hide command-line bar when not used
 
-if vim.fn.has("nvim-0.9.0") == 1 then
-	opt.splitkeep = "screen"
-	opt.shortmess:append({ C = true })
-end
+opt.fillchars = {
+	foldopen = "",
+	foldclose = "",
+	-- fold = "⸱",
+	fold = " ",
+	foldsep = " ",
+	diff = "╱",
+	eob = " ",
+}
 
 opt.shada = "!,'100,<1000,s1000,h"
 -- ! save and restore global variables (ALL CAPS)
@@ -73,6 +79,26 @@ opt.shada = "!,'100,<1000,s1000,h"
 -- <1000 remember registers with up to 1000 lines
 -- s1000 remember registers with content weighting up to 1000 kb
 -- h doesnt apply highlighting on load
+
+if vim.fn.has("nvim-0.10") == 1 then
+	opt.smoothscroll = true
+end
+
+-- Folding
+vim.opt.foldlevel = 99
+vim.opt.foldtext = "v:lua.require'exsqzme.util.ui'.foldtext()"
+if vim.fn.has("nvim-0.9.0") == 1 then
+	vim.opt.statuscolumn = [[%!v:lua.require'exsqzme.util.ui'.statuscolumn()]]
+end
+
+-- HACK: causes freezes on <= 0.9, so only enable on >= 0.10 for now
+if vim.fn.has("nvim-0.10") == 1 then
+	vim.opt.foldmethod = "expr"
+	vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+	vim.opt.statuscolumn = [[%!v:lua.require'exsqzme.util.ui'.statuscolumn()]]
+else
+	vim.opt.foldmethod = "indent"
+end
 
 -- Fix markdown indentation settings
 vim.g.markdown_recommended_style = 0

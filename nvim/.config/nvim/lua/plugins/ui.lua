@@ -22,6 +22,7 @@ return {
 		"nvim-lualine/lualine.nvim", -- Fancier statusline
 		-- Executed after the plugin is loaded
 		-- If only calling setup, can just set the config to a lua table
+		event = "VeryLazy",
 		config = function()
 			-- Set lualine as statusline
 			-- See `:help lualine.txt`
@@ -83,18 +84,18 @@ return {
 			dashboard.section.header.val = vim.split(logo, "\n")
 			dashboard.section.buttons.val = {
 				-- dashboard.button( "f", "  > Find file", ":cd $HOME/dev | Telescope find_files<CR>"),
-				dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
-				dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
-				dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
-				dashboard.button("g", " " .. " Find text", ":Telescope live_grep <CR>"),
+				dashboard.button("f", " " .. " Find file", "<cmd> Telescope find_files <CR>"),
+				dashboard.button("n", " " .. " New file", "<cmd> ene <BAR> startinsert <CR>"),
+				dashboard.button("r", " " .. " Recent files", "<cmd> Telescope oldfiles <CR>"),
+				dashboard.button("g", " " .. " Find text", "<cmd> Telescope live_grep <CR>"),
 				dashboard.button(
 					"c",
 					" " .. " Config",
-					":cd $HOME/dev/github.com/exsqzme/.dotfiles | Telescope git_files show_untracked=true<CR>"
+					"<cmd> cd $HOME/dev/github.com/exsqzme/.dotfiles | Telescope git_files show_untracked=true<CR>"
 				),
-				dashboard.button("s", " " .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
-				dashboard.button("l", "鈴" .. " Lazy", ":Lazy<CR>"),
-				dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+				dashboard.button("s", " " .. " Restore Session", [[<cmd> lua require("persistence").load() <cr>]]),
+				dashboard.button("l", "鈴" .. " Lazy", "<cmd> Lazy<CR>"),
+				dashboard.button("q", " " .. " Quit", "<cmd> qa<CR>"),
 			}
 			for _, button in ipairs(dashboard.section.buttons.val) do
 				button.opts.hl = "AlphaButtons"
@@ -108,6 +109,7 @@ return {
 			return dashboard
 		end,
 		config = function(_, dashboard)
+			vim.o.laststatus = 0
 			-- close Lazy and re-open when the dashboard is ready
 			if vim.o.filetype == "lazy" then
 				vim.cmd.close()
@@ -175,25 +177,29 @@ return {
 	-- indent guides for Neovim
 	{
 		"lukas-reineke/indent-blankline.nvim",
-		event = { "BufReadPost", "BufNewFile" },
+		event = "LazyFile",
 		opts = {
-			-- char = "▏",
-			char = "│",
-			pattern = {
-				"help",
-				"alpha",
-				"dashboard",
-				"neo-tree",
-				"Trouble",
-				"lazy",
-				"mason",
-				"notify",
-				"toggleterm",
-				"lazyterm",
+			indent = {
+				char = "│",
+				tab_char = "│",
 			},
-			show_trailing_blankline_indent = false,
-			show_current_context = false,
+			scope = { enabled = false },
+			exclude = {
+				filetypes = {
+					"help",
+					"alpha",
+					"dashboard",
+					"neo-tree",
+					"Trouble",
+					"lazy",
+					"mason",
+					"notify",
+					"toggleterm",
+					"lazyterm",
+				},
+			},
 		},
+		main = "ibl",
 	},
 
 	-- noicer ui

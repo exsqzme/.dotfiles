@@ -45,7 +45,7 @@ bindkey -s ^f "tmux-sessionizer\n"
 # https://rutar.org/writing/from-vim-and-tmux-to-neovim/
 
 # TODO: Find a place for this
-alias nvim-lazy="NVIM_APPNAME=LazyVim nvim"
+alias lvim="NVIM_APPNAME=LazyVim nvim"
 # alias nvim-kick="NVIM_APPNAME=kickstart nvim"
 # alias nvim-chad="NVIM_APPNAME=NvChad nvim"
 # alias nvim-astro="NVIM_APPNAME=AstroNvim nvim"

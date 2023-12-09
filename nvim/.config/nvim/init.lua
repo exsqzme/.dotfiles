@@ -42,6 +42,7 @@ require("lazy").setup({
 		{ import = "plugins.extras.lang.c" },
 		{ import = "plugins.extras.lang.rust" },
 		{ import = "plugins.extras.lang.python" },
+		{ import = "plugins.extras.lang.flutter" },
 		{ import = "plugins.extras.dap.core" },
 		-- { import = "plugins.extras.dap.nlua" },
 		{ import = "plugins.extras.test.core" },
